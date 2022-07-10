@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group 'de.hypercdn.dgl'
+version '1.0.0.' + System.getenv("BUILD_NUMBER") + System.getenv("BUILD_APPENDIX")
+sourceCompatibility = 17
+targetCompatibility = 17
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    api group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.3'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.3'
+
+
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.0.0-alpha.10'
+
+    jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        from {
+            configurations.compileClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+        }
+    }
+}
+
+test {
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'hours'
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'hours'
+}
+
+shadowJar {
+    archiveClassifier.set("")
+}
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username findProperty("nexusu") as String
+                password findProperty("nexusp") as String
+            }
+            url version.endsWith('SNAPSHOT') ? findProperty("nexussr") as String : findProperty("nexusr") as String
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Discord-Gateway-Listener'
+                description = ''
+                url = 'https://github.com/HyperCDN/Discord-Gateway-Listener'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/HyperCDN/Discord-Gateway-Listener'
+                    developerConnection = 'scm:git:ssh:git@github.com:HyperCDN/Discord-Gateway-Listener'
+                    url = 'https://github.com/HyperCDN/Discord-Gateway-Listener'
+                }
+            }
+        }
+    }
+}
