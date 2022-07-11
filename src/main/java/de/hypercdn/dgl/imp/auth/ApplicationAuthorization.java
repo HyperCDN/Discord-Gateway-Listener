@@ -1,6 +1,7 @@
 package de.hypercdn.dgl.imp.auth;
 
 import de.hypercdn.dgl.api.auth.Authorization;
+import de.hypercdn.dgl.api.auth.IdentifyPayload;
 import de.hypercdn.dgl.api.event.Event;
 import de.hypercdn.dgl.imp.event.payload.Identify;
 import de.hypercdn.dgl.imp.event.payload.UpdatePresence;
@@ -28,7 +29,7 @@ public class ApplicationAuthorization implements Authorization {
     }
 
     @Override
-    public Event<?> identifyEvent() {
+    public Event<? extends IdentifyPayload> identifyEvent() {
         return identifyEvent;
     }
 }

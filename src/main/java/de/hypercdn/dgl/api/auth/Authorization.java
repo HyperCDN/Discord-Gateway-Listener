@@ -4,6 +4,6 @@ import de.hypercdn.dgl.api.event.Event;
 
 public interface Authorization {
 
-    Event<?> identifyEvent();
+    Event<? extends IdentifyPayload> identifyEvent();
 
 }

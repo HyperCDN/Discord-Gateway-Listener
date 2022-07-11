@@ -5,21 +5,27 @@ import de.hypercdn.dgl.api.event.Event;
 import de.hypercdn.dgl.api.event.EventManager;
 import de.hypercdn.dgl.imp.connection.GatewayConnectionImp;
 import de.hypercdn.dgl.imp.event.GenericEventManager;
+import de.hypercdn.dgl.imp.event.type.internal.InternalEvent;
 import okhttp3.OkHttpClient;
 
 public interface GatewayConnection extends AutoCloseable {
 
-    static String GATEWAY_URL = "wss://gateway.discord.gg/";
+    String BASE_URL = "https://discord.com/api";
+    String GATEWAY_URL_FALLBACK = "wss://gateway.discord.gg/";
 
     static GatewayConnection createDefault(Details details, Authorization authorization) {
-        return createDefault(new OkHttpClient(), details, authorization);
+        return createDefault(new OkHttpClient(), details, authorization, true);
     }
 
-    static GatewayConnection createDefault(OkHttpClient okHttpClient, Details details, Authorization authorization) {
-        return new GatewayConnectionImp(okHttpClient, authorization, details, new GenericEventManager());
+    static GatewayConnection createDefault(OkHttpClient okHttpClient, Details details, Authorization authorization, boolean reconnect) {
+        return new GatewayConnectionImp(okHttpClient, authorization, details, new GenericEventManager(), reconnect);
     }
 
     EventManager eventManager();
+
+    boolean doesReconnect();
+
+    void enableReconnect(boolean state);
 
     void open();
 
@@ -27,12 +33,13 @@ public interface GatewayConnection extends AutoCloseable {
 
     void send(Event<?> event);
 
+    void notifyInternal(InternalEvent<?> internalEvent);
+
     record Details(
             Integer apiVersion,
             String encoding,
             String compression) {
-
-        public String asParamString() {
+        public String asGatewayParamString() {
             return "?v=" + apiVersion + "&encoding=" + encoding + ((compression != null) ? "&compress=" + compression : "");
         }
     }
