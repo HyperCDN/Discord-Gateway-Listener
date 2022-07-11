@@ -86,8 +86,10 @@ public class GatewayConnectionImp implements GatewayConnection {
     public synchronized void close() {
         // stop heartbeat and close
         heart.stopAndReset();
-        webSocket.close(1000, "Closing"); // ??
-        webSocket = null;
+        if (webSocket != null) {
+            webSocket.close(1000, "Closing"); // ??
+            webSocket = null;
+        }
         // do not reset connection as we might want to resume
         // connect.reset();
         notifyInternal(new ConnectionEvent(ConnectionEvent.ConnectionStatus.CLOSED));
