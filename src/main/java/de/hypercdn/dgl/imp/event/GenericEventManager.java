@@ -19,7 +19,6 @@ public class GenericEventManager implements EventManager {
 
     @Override
     public void onEvent(GatewayConnection gatewayConnection, Event<?> event) {
-        System.out.println(event.toString());
         for (var listener : new ArrayList<>(listeners)) {
             listener.onEvent(gatewayConnection, event);
         }
